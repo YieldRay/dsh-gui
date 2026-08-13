@@ -35,13 +35,14 @@ export function cacheDir(): string {
 }
 
 /**
- * Path, relative to an extracted Node archive root, to the `node` executable.
- * Pure so it can be unit-tested per platform.
- * - unix: `bin/node`
- * - windows: `node.exe` (at archive root)
+ * Path segments, relative to an extracted Node archive root, to the `node`
+ * executable. Returned as segments (not a joined string) so the caller can
+ * `join()` them with the correct OS separator. Pure / unit-testable.
+ * - unix: `["bin", "node"]`
+ * - windows: `["node.exe"]` (at archive root)
  */
-export function nodeBinSubpath(os: Os): string {
-  return os === "windows" ? "node.exe" : join("bin", "node");
+export function nodeBinSubpath(os: Os): string[] {
+  return os === "windows" ? ["node.exe"] : ["bin", "node"];
 }
 
 /** Installed absolute path of the node binary we manage. */

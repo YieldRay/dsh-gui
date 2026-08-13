@@ -5,7 +5,7 @@
   "tasks": {
     "dev": "deno desktop -A --unstable-raw-imports --hmr main.ts",
     "build": "deno desktop -A --unstable-raw-imports --output DSH.app main.ts",
-    "test": "deno test -A --unstable-raw-imports"
+    "test": "deno test -A --unstable-raw-imports src/"
   },
   "desktop": {
     "app": {

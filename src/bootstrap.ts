@@ -161,7 +161,7 @@ async function installNode(os: Os, arch: Arch, report: Reporter): Promise<void> 
 
   // The archive extracts to a single top-level dir: node-<version>-<os>-<arch>/
   const archiveDir = join(extractRoot, nodeArchiveName(version, os, arch));
-  const srcBin = join(archiveDir, nodeBinSubpath(os));
+  const srcBin = join(archiveDir, ...nodeBinSubpath(os));
   await Deno.mkdir(binDir(), { recursive: true });
   const destBin = nodeBinPath(os);
   await Deno.copyFile(srcBin, destBin);
