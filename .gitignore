@@ -1,8 +1,15 @@
 .DS_Store
 
 # deno desktop build output
+dist/
 *.app/
 *.exe
 *.dylib
 *.dylib.tmp-*
+*.dmg
+*.msi
+*.AppImage
+*.deb
+*.rpm
 DSH.app/
+.deno-dir/
