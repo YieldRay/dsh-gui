@@ -26,6 +26,15 @@ export function nodeModulesDir(): string {
 }
 
 /**
+ * Persistent cacache directory for npm metadata + tarballs. Sharing this across
+ * installs lets arborist/pacote reuse fetched packfiles and manifests, which is
+ * most of the wall-clock cost on a large tree.
+ */
+export function cacheDir(): string {
+  return join(rootDir(), ".cache");
+}
+
+/**
  * Path, relative to an extracted Node archive root, to the `node` executable.
  * Pure so it can be unit-tested per platform.
  * - unix: `bin/node`

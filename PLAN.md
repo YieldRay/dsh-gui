@@ -23,7 +23,10 @@ app bundle (e.g. macOS `.app`) via `deno desktop` (https://docs.deno.com/runtime
    `Deno.build.os` / `Deno.build.arch`, downloading bytes from the npmmirror binary mirror
    (`https://cdn.npmmirror.com/binaries/node/<version>/`).
 3. If `@deepseek-ai/dsh` is missing, install it with `@npmcli/arborist` (run under Deno), using the
-   npmmirror registry (`https://registry.npmmirror.com/`) and showing live install progress.
+   npmmirror registry (`https://registry.npmmirror.com/`) and showing live install progress. For
+   speed the constructor passes `audit: false` (skips the quick-audit registry round-trip),
+   `cache: ~/dsh-gui/.cache` (persistent cacache — metadata and tarballs survive across runs, a ~24×
+   speedup on a warm cache), and `ignoreScripts: true` (skips the postinstall build phase).
 
 ### Arborist install with live progress
 

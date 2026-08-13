@@ -30,6 +30,7 @@ import { componentStatus, type VersionsSnapshot } from "./versions.ts";
 import { denoPortProbe, pickPort } from "./port.ts";
 import {
   binDir,
+  cacheDir,
   dshBinPath,
   dshPackageJsonPath,
   nodeBinPath,
@@ -220,6 +221,7 @@ async function extractZip(zipPath: string, destDir: string): Promise<void> {
 async function installDsh(report: Reporter): Promise<void> {
   report({ phase: "install-resolve", message: `resolving ${DSH_PACKAGE_NAME}…` });
   await Deno.mkdir(rootDir(), { recursive: true });
+  await Deno.mkdir(cacheDir(), { recursive: true });
 
   // proc-log emits `time` and `log` events on the global process object;
   // these aren't on the standard node:process type, so narrow to what we use.
@@ -232,6 +234,12 @@ async function installDsh(report: Reporter): Promise<void> {
     path: rootDir(),
     packageLock: false,
     registry: NPM_REGISTRY,
+    // Speed: skip the quick-audit registry round-trip (audit === false
+    // short-circuits it entirely), persist metadata + tarballs in a cacache
+    // dir so they survive across runs, and skip the postinstall build phase.
+    audit: false,
+    cache: cacheDir(),
+    ignoreScripts: true,
   });
 
   let total: number | null = null;
