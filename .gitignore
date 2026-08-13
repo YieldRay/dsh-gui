@@ -1,0 +1,8 @@
+.DS_Store
+
+# deno desktop build output
+*.app/
+*.exe
+*.dylib
+*.dylib.tmp-*
+DSH.app/
