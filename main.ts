@@ -32,7 +32,7 @@ function subscribe(fn: Listener): () => void {
 }
 
 // dsh child process, killed when the app exits.
-let child: Deno.ChildProcess | undefined;
+let child: import("node:child_process").ChildProcess | undefined;
 
 function shutdown() {
   try {
@@ -88,9 +88,9 @@ setupShell({
     child = result.child;
     emit({ phase: "ready", message: "ready", url: result.url }, result.url);
     // If dsh dies, surface it in the UI.
-    result.child.status.then((s) => {
-      if (!s.success) {
-        emit({ phase: "error", message: `dsh exited with code ${s.code}` });
+    result.child.on("exit", (code) => {
+      if (code !== 0) {
+        emit({ phase: "error", message: `dsh exited with code ${code}` });
       }
     });
   } catch (err) {

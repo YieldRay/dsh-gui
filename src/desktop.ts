@@ -66,7 +66,7 @@ function buildMenu(v: VersionsSnapshot): Deno.MenuItem[] {
           "separator",
           {
             item: {
-              label: "Check for Updates…",
+              label: "Check for Updates...",
               id: "check-updates",
               accelerator: "CmdOrCtrl+U",
               enabled: true,

@@ -14,7 +14,8 @@
     "jsr:@std/tar@~0.1.10": "0.1.10",
     "npm:@npmcli/arborist@*": "10.0.2",
     "npm:@npmcli/arborist@^10.0.2": "10.0.2",
-    "npm:@types/npmcli__arborist@^6.3.3": "6.3.3"
+    "npm:@types/npmcli__arborist@^6.3.3": "6.3.3",
+    "npm:@zip.js/zip.js@^2.8.49": "2.8.49"
   },
   "jsr": {
     "@std/assert@1.0.19": {
@@ -316,6 +317,9 @@
       "dependencies": [
         "@types/node"
       ]
+    },
+    "@zip.js/zip.js@2.8.49": {
+      "integrity": "sha512-TY3fKR/IQqPJqrOQAohvW6kv7Qd1aehzU7M7hbqhNNKxVP8uKSMO+aUlBwtdWzTCd62E0YOB+HHW9N0hMihrWw=="
     },
     "abbrev@5.0.0": {
       "integrity": "sha512-/XrFJgzQQQHpti1raDJC6m4ws6aNktmjBlhk8Fdlk7LwCEuDoieEJJY9OFHjfiFJFFRM2tK+Ky/IsfbbmlMu1w=="
@@ -941,7 +945,8 @@
       "jsr:@std/path@^1.1.6",
       "jsr:@std/tar@~0.1.10",
       "npm:@npmcli/arborist@^10.0.2",
-      "npm:@types/npmcli__arborist@^6.3.3"
+      "npm:@types/npmcli__arborist@^6.3.3",
+      "npm:@zip.js/zip.js@^2.8.49"
     ]
   }
 }

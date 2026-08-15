@@ -4,6 +4,7 @@
 dist/
 *.app/
 *.exe
+*.dll
 *.dylib
 *.dylib.tmp-*
 *.dmg
@@ -11,5 +12,6 @@ dist/
 *.AppImage
 *.deb
 *.rpm
-DSH.app/
 .deno-dir/
+DeepSeek.app/
+DeepSeek/
