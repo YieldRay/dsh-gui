@@ -4,13 +4,13 @@
   "exports": "./main.ts",
   "tasks": {
     "dev": "deno desktop -A --unstable-raw-imports --hmr main.ts",
-    "build": "deno desktop -A --unstable-raw-imports --output DSH.app main.ts",
+    "build": "deno desktop -A --unstable-raw-imports --output DeepSeek.app main.ts",
     "test": "deno test -A --unstable-raw-imports src/"
   },
   "desktop": {
     "app": {
       "name": "DeepSeek",
-      "identifier": "ai.deepseek.dsh-gui",
+      "identifier": "fun.yieldray.deepseek",
       "icons": {
         "macos": [
           { "path": "./assets/icon-16.png", "size": 16 },
@@ -22,7 +22,7 @@
         "linux": "./assets/icon-512.png"
       }
     },
-    "backend": "webview"
+    "backend": "cef"
   },
   "unstable": ["raw-imports"],
   "fmt": {
@@ -40,6 +40,7 @@
     "@std/encoding": "jsr:@std/encoding@^1.0.11",
     "@std/path": "jsr:@std/path@^1.1.6",
     "@std/tar": "jsr:@std/tar@^0.1.10",
-    "@types/npmcli__arborist": "npm:@types/npmcli__arborist@^6.3.3"
+    "@types/npmcli__arborist": "npm:@types/npmcli__arborist@^6.3.3",
+    "@zip.js/zip.js": "npm:@zip.js/zip.js@^2.8.49"
   }
 }

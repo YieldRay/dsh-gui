@@ -13,8 +13,9 @@
  */
 import { dirname, join } from "@std/path";
 import { UntarStream } from "@std/tar";
+import { Uint8ArrayReader, Uint8ArrayWriter, ZipReader } from "@zip.js/zip.js";
+import type { ChildProcess } from "node:child_process";
 import process from "node:process";
-// @ts-types="@types/npmcli__arborist"
 import Arborist from "@npmcli/arborist";
 import {
   type Arch,
@@ -26,6 +27,7 @@ import {
   resolveLtsVersion,
 } from "./node_version.ts";
 import { DSH_PACKAGE_NAME, parseInstalledVersion } from "./dsh_package.ts";
+import { runCommand, spawnChild } from "./proc.ts";
 import { componentStatus, type VersionsSnapshot } from "./versions.ts";
 import { denoPortProbe, pickPort } from "./port.ts";
 import {
@@ -87,13 +89,9 @@ async function detectInstalledDshVersion(): Promise<string | null> {
 async function detectInstalledNodeVersion(os: Os): Promise<string | null> {
   if (!(await pathExists(nodeBinPath(os)))) return null;
   try {
-    const { success, stdout } = await new Deno.Command(nodeBinPath(os), {
-      args: ["--version"],
-      stdout: "piped",
-      stderr: "null",
-    }).output();
+    const { success, stdout } = await runCommand(nodeBinPath(os), ["--version"]);
     if (!success) return null;
-    return new TextDecoder().decode(stdout).trim() || null;
+    return stdout.trim() || null;
   } catch {
     return null;
   }
@@ -200,18 +198,29 @@ async function extractTarGz(tarGzPath: string, destDir: string): Promise<void> {
 }
 
 /**
- * Extract a .zip (Windows Node build). Deno has no bundled zip reader, so shell
- * out to the OS `tar` (Windows 10+ ships bsdtar, which reads zip).
+ * Extract a .zip (Windows Node build) entirely in-process. Like the unix
+ * tar.gz path, this never spawns a subprocess.
  */
 async function extractZip(zipPath: string, destDir: string): Promise<void> {
   await Deno.mkdir(destDir, { recursive: true });
-  const cmd = new Deno.Command("tar", {
-    args: ["-xf", zipPath, "-C", destDir],
-    stdout: "inherit",
-    stderr: "inherit",
-  });
-  const { success, code } = await cmd.output();
-  if (!success) throw new Error(`zip extraction failed (tar exit ${code})`);
+  const reader = new ZipReader(new Uint8ArrayReader(await Deno.readFile(zipPath)));
+  try {
+    for (const entry of await reader.getEntries()) {
+      const outPath = join(destDir, entry.filename);
+      if (!outPath.startsWith(destDir)) {
+        throw new Error(`zip entry escapes destination: ${entry.filename}`);
+      }
+      if (entry.directory) {
+        await Deno.mkdir(outPath, { recursive: true });
+        continue;
+      }
+      const data = await entry.getData(new Uint8ArrayWriter());
+      await Deno.mkdir(dirname(outPath), { recursive: true });
+      await Deno.writeFile(outPath, data);
+    }
+  } finally {
+    await reader.close();
+  }
 }
 
 /**
@@ -279,19 +288,20 @@ async function installDsh(report: Reporter): Promise<void> {
   await arb.reify({ add: [`${DSH_PACKAGE_NAME}@latest`], save: false });
 }
 
-/** Spawn dsh on the managed Node at the chosen port. Returns child + port. */
-function spawnDsh(os: Os, port: number): Deno.ChildProcess {
-  const cmd = new Deno.Command(nodeBinPath(os), {
-    args: [dshBinPath(), "--profile", "web", "--port", String(port)],
-    stdout: "inherit",
-    stderr: "inherit",
-    env: { PATH: `${binDir()}:${Deno.env.get("PATH") ?? ""}` },
-  });
-  return cmd.spawn();
+/**
+ * Spawn dsh on the managed Node at the chosen port. Output is drained and
+ * discarded (the web UI is served over HTTP, not the terminal).
+ */
+function spawnDsh(os: Os, port: number): ChildProcess {
+  return spawnChild(
+    nodeBinPath(os),
+    [dshBinPath(), "--profile", "web", "--port", String(port)],
+    { prependPath: binDir() },
+  );
 }
 
 export interface BootstrapResult {
-  child: Deno.ChildProcess;
+  child: ChildProcess;
   url: string;
   port: number;
 }
